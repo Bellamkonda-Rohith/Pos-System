@@ -22,13 +22,7 @@ const DashboardScreen = () => {
   const totalDiscount = totalPrice * discountPercentage;
   const totalRevenue = totalPrice - totalDiscount;
 
-  const refreshData = () => {
-    // Handle refresh data logic here
-  };
 
-  const viewDetailedReports = () => {
-    // Handle view detailed reports logic here
-  };
 
   return (
     <Container>
@@ -91,16 +85,7 @@ const DashboardScreen = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6}>
-          <Paper sx={{ display: 'flex', justifyContent: 'space-between', p: 2 }}>
-            <Button variant="contained" color="primary" onClick={refreshData}>
-              Refresh Data
-            </Button>
-            <Button variant="contained" color="secondary" onClick={viewDetailedReports}>
-              View Detailed Reports
-            </Button>
-          </Paper>
-        </Grid>
+
       </Grid>
     </Container>
   );
