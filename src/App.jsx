@@ -1,28 +1,39 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from '../src/theme/theme';
 
 
 
-import cart from "../src/component/pages/cart"
-import NavBar from '../src/components/NavBar';
-import posScreen from './component/pages/posScreen';
+
+import ShoppingCartScreen from './pages/ShoppingCartScreen';
+import PosScreening from './pages/PosScreening'
+import PaymentScreen from './pages/PaymentScreen';
+import OrderConfirmationScreen from './pages/OrderConfirmationScreen';
+import DashboardScreen from './pages/DashboardScreen';
+import NavBar from './components/Navbar';
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    
+    
       <Router>
-        <NavBar />
+        <NavBar/>
         <Routes>
-          <Route path="/" element={< posScreen/>} />
-          <Route path="/cart" element={<cart />} />
-         
-          <Route path="/dashboard" element={<DashboardScreen />} />
+        <Route path="/" element={< PosScreening />} />
+        <Route path="/PosScreening" element={< PosScreening/>} />
+        
+          <Route path="/PosScreening" element={<PosScreening />} />
+
+          
+        <Route path="/cart" element={<ShoppingCartScreen />} />
+        <Route path="/PaymentScreen" element={<PaymentScreen />} />
+        <Route path="/OrderConfirmationScreen" element={<OrderConfirmationScreen />} />
+        <Route path="/DashboardScreen" element={<DashboardScreen/>} />
+        
+      
+        
+        
         </Routes>
       </Router>
-    </ThemeProvider>
+  
   );
 }
 
