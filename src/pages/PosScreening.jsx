@@ -1,11 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Typography, Button, Select, MenuItem, IconButton, Box, Card, CardContent, Grid } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+import {
+  Typography,
+  Button,
+  Select,
+  MenuItem,
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  CircularProgress,
+  useTheme,
+} from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { useNavigate } from 'react-router-dom';
-import { addItem, incrementQuantity, decrementQuantity } from '../Redux/CartSlice';
+import { addItem } from '../Redux/CartSlice';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const PosScreening = () => {
   const data = [
@@ -19,20 +29,23 @@ const PosScreening = () => {
 
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const cart = useSelector((state) => state.cart.cart);
-  const [quantity, setQuantity] = useState(1);
-
-  useEffect(() => {
-    const itemInCart = cart.find((item) => item.itemCode === selectedItem);
-    setQuantity(itemInCart ? itemInCart.quantity : 1);
-  }, [selectedItem, cart]);
+  const { totalItems, totalPrice } = useSelector((state) => state.cart);
 
   const handleAddToCart = () => {
-    const item = data.find(i => i.itemCode === selectedItem);
+    setLoading(true);
+    const item = data.find((i) => i.itemCode === selectedItem);
     if (item) {
       dispatch(addItem({ ...item, quantity: 1 }));
+      setTimeout(() => {
+        setLoading(false);
+        setSnackbarOpen(true);
+      }, 500); // Simulate loading delay
     }
   };
 
@@ -40,22 +53,34 @@ const PosScreening = () => {
     navigate('/cart');
   };
 
-  const handleIncrement = () => {
-    dispatch(incrementQuantity(selectedItem));
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
-
-  const handleDecrement = () => {
-    dispatch(decrementQuantity(selectedItem));
-  };
-
-  const { totalItems, totalPrice } = useSelector((state) => state.cart);
 
   return (
-    <div>
-      <Box sx={{ p: 3 }}>
-        <Card sx={{ mb: 3 }}>
+    <Box
+      sx={{
+        p: 3,
+        backgroundColor: theme.palette.background.default,
+        minHeight: '100vh',
+      }}
+    >
+      {/* Item Selection Card */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card
+          sx={{
+            mb: 3,
+            borderRadius: 2,
+            boxShadow: 3,
+            backgroundColor: theme.palette.background.paper,
+          }}
+        >
           <CardContent>
-            <Typography variant="h6" sx={{ mb: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
               Select Item and Quantity
             </Typography>
             <Grid container spacing={2} alignItems="center">
@@ -65,78 +90,135 @@ const PosScreening = () => {
                   onChange={(e) => setSelectedItem(e.target.value)}
                   fullWidth
                   displayEmpty
+                  sx={{ borderRadius: 1 }}
                 >
                   <MenuItem value="" disabled>
                     Select an Item
                   </MenuItem>
                   {data.map((item) => (
                     <MenuItem key={item.itemCode} value={item.itemCode}>
-                      {`${item.itemCode} - ${item.itemName} ($${item.itemPrice})`} 
+                      {`${item.itemCode} - ${item.itemName} ($${item.itemPrice})`}
                     </MenuItem>
                   ))}
                 </Select>
               </Grid>
-
-              <Grid
-                item
-                xs={12}
-                md={6}
-                sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <IconButton onClick={handleDecrement}>
-                  <RemoveIcon />
-                </IconButton>
-                <Typography variant="body1" sx={{ mx: 2 }}>
-                  {quantity}
-                </Typography>
-                <IconButton onClick={handleIncrement}>
-                  <AddIcon />
-                </IconButton>
-              </Grid>
             </Grid>
 
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ width: '100%', mt: 2 }}
-              onClick={handleAddToCart}
-              disabled={!selectedItem}
-            >
-              Add to Cart
-            </Button>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{
+                  width: '100%',
+                  mt: 2,
+                  borderRadius: 1,
+                }}
+                onClick={handleAddToCart}
+                disabled={!selectedItem || loading}
+                startIcon={loading ? <CircularProgress size={20} /> : null}
+              >
+                {loading ? 'Adding...' : 'Add to Cart'}
+              </Button>
+            </motion.div>
           </CardContent>
         </Card>
-      </Box>
+      </motion.div>
 
-      {totalItems > 0 && (
-        <Box sx={{ p: 3 }}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6">Cart Summary</Typography>
-              {cart.map((item, index) => (
-                <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography>{item.itemName} (x{item.quantity})</Typography>
-                  <Typography>${(item.itemPrice * item.quantity).toFixed(2)}</Typography>
-                </Box>
-              ))}
-              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Typography>Total Items: {totalItems}</Typography>
-                <Typography>Total Price: ${totalPrice.toFixed(2)}</Typography>
-              </Box>
-            </CardContent>
-          </Card>
-          <Button
-            variant="contained"
-            color="secondary"
-            sx={{ width: '100%', mt: 2 }}
-            onClick={handleCart}
-            startIcon={<ShoppingCartIcon />}
+      {/* Cart Summary Card */}
+      <AnimatePresence>
+        {totalItems > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
           >
-            Go to Cart
-          </Button>
-        </Box>
-      )}
-    </div>
+            <Box sx={{ p: 3 }}>
+              <Card
+                sx={{
+                  borderRadius: 2,
+                  boxShadow: 3,
+                  backgroundColor: theme.palette.background.paper,
+                }}
+              >
+                <CardContent>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                    Cart Summary
+                  </Typography>
+                  {cart.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          mb: 1,
+                          p: 1,
+                          borderRadius: 1,
+                          '&:hover': {
+                            backgroundColor: theme.palette.action.hover,
+                          },
+                        }}
+                      >
+                        <Typography>{item.itemName} (x{item.quantity})</Typography>
+                        <Typography>${(item.itemPrice * item.quantity).toFixed(2)}</Typography>
+                      </Box>
+                    </motion.div>
+                  ))}
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                    <Typography>Total Items: {totalItems}</Typography>
+                    <Typography>Total Price: ${totalPrice.toFixed(2)}</Typography>
+                  </Box>
+                </CardContent>
+              </Card>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  sx={{
+                    width: '100%',
+                    mt: 2,
+                    borderRadius: 1,
+                  }}
+                  onClick={handleCart}
+                  startIcon={<ShoppingCartIcon />}
+                >
+                  Go to Cart
+                </Button>
+              </motion.div>
+            </Box>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Snackbar Notification */}
+      <AnimatePresence>
+        {snackbarOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+            style={{
+              position: 'fixed',
+              bottom: 20,
+              right: 20,
+              backgroundColor: theme.palette.success.main,
+              color: theme.palette.success.contrastText,
+              padding: '10px 20px',
+              borderRadius: 4,
+              boxShadow: theme.shadows[3],
+            }}
+          >
+            Item added to cart!
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </Box>
   );
 };
 

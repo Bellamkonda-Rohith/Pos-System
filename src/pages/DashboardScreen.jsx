@@ -1,8 +1,15 @@
-import { useSelector } from 'react-redux';
-import { Container, Card, CardContent, Typography, Button, Box, Grid, Paper } from '@mui/material';
+import { useSelector, useDispatch } from 'react-redux';
+import { Container, Card, CardContent, Typography, Button, Box, Grid, IconButton } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import HomeIcon from '@mui/icons-material/Home';
+import { resetCart } from '../Redux/CartSlice'; // Importing the resetCart action
 
 const DashboardScreen = () => {
   const { cart, totalItems, totalPrice } = useSelector((state) => state.cart);
+  const dispatch = useDispatch(); // Using useDispatch to dispatch actions
+  const navigate = useNavigate();
 
   const topItemsSold = cart
     .map((item) => ({
@@ -22,16 +29,31 @@ const DashboardScreen = () => {
   const totalDiscount = totalPrice * discountPercentage;
   const totalRevenue = totalPrice - totalDiscount;
 
+  const handleBack = () => {
+    navigate("/OrderConfirmationScreen");
+  };
 
+  const handleHome = () => {
+    dispatch(resetCart()); // Dispatching resetCart action to empty the cart
+    navigate("/");
+  };
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom align="center" sx={{ mt: 4 }}>
-        Dashboard
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, mt: 4 }}>
+        <IconButton onClick={handleBack} color="primary" component={motion.div} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h4" gutterBottom align="center" sx={{ flex: 1 }} component={motion.div} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+          Dashboard
+        </Typography>
+        <IconButton onClick={handleHome} color="primary" component={motion.div} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+          <HomeIcon />
+        </IconButton>
+      </Box>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card component={motion.div} initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Top 5 Items Sold
@@ -46,7 +68,7 @@ const DashboardScreen = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card component={motion.div} initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Orders
@@ -56,7 +78,7 @@ const DashboardScreen = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card component={motion.div} initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Orders Cost
@@ -66,7 +88,7 @@ const DashboardScreen = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card component={motion.div} initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Discount
@@ -76,7 +98,7 @@ const DashboardScreen = () => {
           </Card>
         </Grid>
         <Grid item xs={12} md={6}>
-          <Card>
+          <Card component={motion.div} initial={{ scale: 0.9 }} animate={{ scale: 1 }} transition={{ duration: 0.5 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
                 Total Revenue
@@ -85,7 +107,6 @@ const DashboardScreen = () => {
             </CardContent>
           </Card>
         </Grid>
-
       </Grid>
     </Container>
   );
