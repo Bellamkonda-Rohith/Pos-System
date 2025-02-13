@@ -10,6 +10,8 @@ import PaymentScreen from './pages/PaymentScreen';
 import OrderConfirmationScreen from './pages/OrderConfirmationScreen';
 import DashboardScreen from './pages/DashboardScreen';
 import NavBar from './components/Navbar';
+import LandingPage from './pages/LandingPage';
+import Footer from './components/Footer';
 function App() {
   return (
     
@@ -17,7 +19,7 @@ function App() {
       <Router>
         <NavBar/>
         <Routes>
-        <Route path="/" element={< PosScreening />} />
+        <Route path="/" element={< LandingPage />} />
         <Route path="/PosScreening" element={< PosScreening/>} />
         
           <Route path="/PosScreening" element={<PosScreening />} />
@@ -31,7 +33,8 @@ function App() {
       
         
         
-        </Routes>
+      </Routes>
+      <Footer/>
       </Router>
   
   );
