@@ -1,0 +1,30 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  /* Remove default focus outlines (customize as needed) */
+  *:focus {
+    outline: none;
+  }
+  
+  /* Optional: Remove default button/styles */
+  button {
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Optional: Remove list styles */
+  ul, ol {
+    list-style: none;
+  }

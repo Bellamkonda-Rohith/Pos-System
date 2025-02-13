@@ -6,6 +6,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../src/components/theme'  // Verify correct import path
 import store from "./Redux/store"
 import App from './App'
+import './index.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
